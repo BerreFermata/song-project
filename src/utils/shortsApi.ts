@@ -22,34 +22,16 @@ export async function fetchShortsBootstrap(): Promise<ShortsSnapshot> {
   const commentsQuery = query(collection(db, 'shorts_comments'), orderBy('createdAt', 'desc'), limit(30));
   const commentsSnap = await getDocs(commentsQuery);
 
-  if (!response.ok) {
-    const responseText = await response.text();
-    let payload: { error?: string } | null = null;
-    try {
-      payload = JSON.parse(responseText) as { error?: string };
-    } catch {
-      // The request reached a web page instead of the shorts API.
-    }
-    throw new Error(payload?.error || '숏폼 파일 업로드에 실패했습니다.');
-  }
+  // 🌟 👇 에러 해결: 끝에 `as any`를 붙여서 타입스크립트를 안심시켜 줍니다!
+  const shorts = shortsSnap.docs.map(d => ({ id: d.id, ...d.data() } as any));
+  const comments = commentsSnap.docs.map(d => ({ id: d.id, ...d.data() } as any));
 
-  const contentType = response.headers.get('content-type') ?? '';
-  const responseText = await response.text();
-  if (!contentType.includes('application/json') || responseText.trimStart().startsWith('<')) {
-    throw new Error(
-      `숏폼 API 서버 주소가 올바르지 않습니다. 현재 서버 주소(${APP_SERVER_URL})와 실행 포트 8788을 확인해 주세요.`
-    );
-  }
+  // 최신순 정렬
+  shorts.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  comments.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
-  let payload: UploadResponse;
-  try {
-    payload = JSON.parse(responseText) as UploadResponse;
-  } catch {
-    throw new Error('숏폼 업로드 서버 응답 형식이 올바르지 않습니다.');
-  }
-  const url = kind === 'video' ? payload.videoUrl : payload.audioUrl;
-  const storageKey =
-    kind === 'video' ? payload.videoStorageKey : payload.audioStorageKey;
+  return { shorts, comments };
+}
 
 export async function uploadShortVideoOnServer(payload: { creatorEmail: string; file: File; }) {
   // 1. 영상이 저장될 이름 만들기 (중복 방지를 위해 현재 시간 추가)
@@ -79,9 +61,22 @@ export async function createShortOnServer(payload: Record<string, any>) {
   const newRef = doc(collection(db, 'shorts'));
   const shortId = newRef.id;
 
-  // 새 숏폼 등록
+  const {
+    audioUrl,
+    audioStorageKey,
+    audioFileName,
+    audioSizeBytes,
+    ...rest
+  } = payload;
+
   await setDoc(newRef, {
-    ...payload,
+    ...rest,
+
+    ...(audioUrl ? { audioUrl } : {}),
+    ...(audioStorageKey ? { audioStorageKey } : {}),
+    ...(audioFileName ? { audioFileName } : {}),
+    ...(audioSizeBytes !== undefined ? { audioSizeBytes } : {}),
+
     id: shortId,
     createdAt: Date.now(),
     likeCount: 0,
@@ -89,7 +84,10 @@ export async function createShortOnServer(payload: Record<string, any>) {
     likedBy: []
   });
 
-  return { shortId, snapshot: await fetchShortsBootstrap() };
+  return {
+    shortId,
+    snapshot: await fetchShortsBootstrap()
+  };
 }
 
 export async function updateShortOnServer(payload: { shortId: string } & Record<string, any>) {
