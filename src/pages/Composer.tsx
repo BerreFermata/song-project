@@ -500,7 +500,7 @@ export function Composer() {
         title: collabProject?.title ?? '협업 프로젝트',
         description: '멤버와 같은 작곡 화면을 실시간으로 편집합니다.',
       };
-    }
+    } 
 
     if (projectId || sourceMode === 'file') {
       return {

@@ -1,14 +1,16 @@
-import { BASS_NOTES, MELODY_NOTES, GUITAR_TRACK_LABELS, DRUM_TRACK_LABELS } from '../constants/composer.ts';
+//import { BASS_NOTES, MELODY_NOTES, GUITAR_TRACK_LABELS, DRUM_TRACK_LABELS } from '../constants/composer.ts';
+import demoSong from '../dummy/song-project.json';
 
-const GITHUB_TOKEN = import.meta.env.VITE_API_KEY;
-const GITHUB_ENDPOINT = 'https://models.inference.ai.azure.com/chat/completions';
+//const GITHUB_TOKEN = import.meta.env.VITE_API_KEY;
+//const GITHUB_ENDPOINT = 'https://models.inference.ai.azure.com/chat/completions';
 
-const TOTAL_STEPS = 640;
-const DRUM_TYPES = ['Kick', 'Snare', 'HiHat', 'Clap', 'Percussion'];
+//const TOTAL_STEPS = 640;
+//const DRUM_TYPES = ['Kick', 'Snare', 'HiHat', 'Clap', 'Percussion'];
 
 /**
  * 공통 모델 호출 함수
  */
+/*
 async function callModel(messages: any[], temperature = 0.8) {
   const response = await fetch(GITHUB_ENDPOINT, {
     method: 'POST',
@@ -32,10 +34,11 @@ async function callModel(messages: any[], temperature = 0.8) {
   const data = await response.json();
   return data.choices[0].message.content;
 }
-
+*/
 /**
  * 1단계 — 실제 작곡 (JSON 절대 금지)
  */
+/*
 async function composeMusicText(prompt: string): Promise<string> {
   return await callModel(
     [
@@ -92,6 +95,7 @@ Output ONLY valid JSON in THIS exact format:
 /**
  * 2단계 — 시퀀서 JSON 변환
  */
+/*
 async function convertToSequencer(musicDescription: string) {
   const jsonText = await callModel(
     [
@@ -137,6 +141,7 @@ Output ONLY valid JSON:
     0.2
   );
 
+  
   try {
     const clean = extractJson(jsonText);
     return JSON.parse(clean);
@@ -155,11 +160,23 @@ function extractJson(text: string) {
 
   throw new Error('No JSON found in AI response');
 }
-
+*/
 /**
  * 최종 외부 호출 함수 (기존 함수 교체)
  */
+
+function delay(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 export async function fetchAiMusic(prompt: string) {
+  console.log('Prompt:', prompt);
+
+  await delay(10000);
+
+  return structuredClone(demoSong);
+}
+/*
   if (!GITHUB_TOKEN?.trim()) {
     throw new Error('GitHub Models token is not configured.');
   }
@@ -178,4 +195,6 @@ export async function fetchAiMusic(prompt: string) {
     volumes: { melody: 82, drums: 78, bass: 84 },
     tracks: parsedData.tracks || { melody: [], drums: [], bass: [] },
   };
-}
+  */
+
+

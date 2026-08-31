@@ -252,7 +252,7 @@ export const GLOCKENSPIEL_SAMPLE_NOTES = [
 
 export const GLOCKENSPIEL_NOTES = sortNotesHighToLow(
   transposeSampleNotesToStart(GLOCKENSPIEL_SAMPLE_NOTES, 'C1', 'C1')
-).reverse();
+);
 
 export const PICCOLO_SAMPLE_NOTES = [
   'C2', 'C#2', 'D2', 'D#2', 'E2', 'F2', 'F#2', 'G2', 'G#2', 'A2', 'A#2', 'B2',
@@ -262,7 +262,7 @@ export const PICCOLO_SAMPLE_NOTES = [
 
 export const PICCOLO_NOTES = sortNotesHighToLow(
   transposeSampleNotesToStart(PICCOLO_SAMPLE_NOTES, 'C2', 'C2')
-).reverse();
+);
 
 export const SUPPORTING_PIANO_NOTES = sortNotesHighToLow([
   'C0', 'C#0', 'D0', 'D#0', 'E0', 'F0', 'F#0', 'G0', 'G#0', 'A0', 'A#0', 'B0',
@@ -283,7 +283,7 @@ export const CHICAGO_STREET_SAMPLE_NOTES = [
 
 export const CHICAGO_STREET_NOTES = sortNotesHighToLow(
   transposeSampleNotesToStart(CHICAGO_STREET_SAMPLE_NOTES, 'C1', 'C1')
-).reverse();
+);
 
 export const STUDIO_ALTO_SAX_SAMPLE_NOTES = [
   'C1', 'C#1', 'D1', 'D#1', 'E1', 'F1', 'F#1', 'G1', 'G#1', 'A1', 'A#1', 'B1',
@@ -294,7 +294,7 @@ export const STUDIO_ALTO_SAX_SAMPLE_NOTES = [
 
 export const STUDIO_ALTO_SAX_NOTES = sortNotesHighToLow(
   transposeSampleNotesToStart(STUDIO_ALTO_SAX_SAMPLE_NOTES, 'C1', 'C#4')
-).reverse();
+);
 
 export const MELODY_MIDI = [
   84, 83, 82, 81, 80, 79, 78, 77, 76, 75, 74, 73, 72, 71, 70, 69, 68, 67,

@@ -208,46 +208,33 @@ const blackKeys = blackNotes.map(
     // =========================
     // 코드 박스 설정
     // =========================
+/*
+const chordCenterX = 170
+const chordCenterY = 330
 
-    const chordStartX = 72
+const chordRadius = 180       // 가운데에서 각 코드까지 거리
+const zoneRadius = 75        // 코드 원 크기
+*/
+const chordNames = ['A','B','C','D','E','F','G']
 
-    const chordStartY = 350
+const wheelCenterX = 120
+const wheelCenterY = 350
 
-    const chordWidth = 78
+const wheelRadius = 220
 
-    const chordHeight = 56
+const angleStep = (Math.PI * 2) / 7
 
-    const chordGap = 8
+const chordZones = chordNames.map((name, index) => ({
+  name,
 
-   const chordNames = [
-    'A',
-    'B',
-    'C',
-    'D',
-    'E',
-    'F',
-    'G',
-  ]
+  startAngle:
+    -Math.PI / 2 +
+    index * angleStep,
 
-    const chordZones =
-      chordNames.map(
-        (name, index) => ({
-          name,
-
-          x:
-            chordStartX +
-            index *
-              (chordWidth +
-                chordGap),
-
-          y: chordStartY,
-
-          width: chordWidth,
-
-          height: chordHeight,
-        })
-      )
-
+  endAngle:
+    -Math.PI / 2 +
+    (index + 1) * angleStep,
+}))
 
     // =========================
     // 손별 이전 위치
@@ -603,40 +590,57 @@ if (instrumentMode === 'piano') {
         instrumentMode === 'guitar'
       ) {
       chordZones.forEach(zone => {
+        ctx.beginPath()
+
+        ctx.moveTo(
+          wheelCenterX,
+          wheelCenterY
+        )
+
+        ctx.arc(
+          wheelCenterX,
+          wheelCenterY,
+          wheelRadius,
+          zone.startAngle,
+          zone.endAngle
+        )
+
+        ctx.closePath()
+
         ctx.fillStyle =
           currentChord === zone.name
-            ? 'rgba(255,255,0,0.7)'
-            : 'rgba(0,0,0,0.5)'
+            ? 'gold'
+            : '#333'
 
-        ctx.fillRect(
-          zone.x,
-          zone.y,
-          zone.width,
-          zone.height
-        )
+        ctx.fill()
 
         ctx.strokeStyle = 'white'
 
-        ctx.lineWidth = 2
+        ctx.stroke()
 
-        ctx.strokeRect(
-          zone.x,
-          zone.y,
-          zone.width,
-          zone.height
-        )
+        const mid =
+          (zone.startAngle +
+            zone.endAngle) / 2
+
+        const textRadius =
+          wheelRadius * 0.65
 
         ctx.fillStyle = 'white'
 
-        ctx.font = '18px Arial'
+        ctx.font = '24px Arial'
 
         ctx.textAlign = 'center'
+
         ctx.textBaseline = 'middle'
 
         ctx.fillText(
           zone.name,
-          zone.x + zone.width / 2,
-          zone.y + zone.height / 2
+          wheelCenterX +
+            Math.cos(mid) *
+              textRadius,
+          wheelCenterY +
+            Math.sin(mid) *
+              textRadius
         )
       })
 
@@ -850,15 +854,25 @@ if (instrumentMode === 'piano') {
 
             if (instrumentMode === 'guitar' && isLeftHand) {
               chordZones.forEach(zone => {
+                const dx =
+                  fingerX - wheelCenterX
+
+                const dy =
+                  fingerY - wheelCenterY
+
+                const distance =
+                  Math.sqrt(dx * dx + dy * dy)
+
+                let angle =
+                  Math.atan2(dy, dx)
+
+                if (angle < -Math.PI / 2)
+                  angle += Math.PI * 2
+
                 const insideZone =
-                  fingerX > zone.x &&
-                  fingerX <
-                    zone.x +
-                      zone.width &&
-                  fingerY > zone.y &&
-                  fingerY <
-                    zone.y +
-                      zone.height
+                  distance <= wheelRadius &&
+                  angle >= zone.startAngle &&
+                  angle < zone.endAngle
 
                 if (insideZone) {
                   if (
